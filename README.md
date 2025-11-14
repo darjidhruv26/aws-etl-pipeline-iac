@@ -7,7 +7,7 @@ The entire infrastructure is defined as code, making it repeatable, versionable,
 
 ## Architecture
 
-<img width="2392" height="1002" alt="ETL_Pipeline_Architecture" src="https://github.com/user-attachments/assets/23db692e-d428-4448-8ff2-e637f9ebf3ef" />
+<img width="2339" height="889" alt="ETL_Pipeline_Architecture_v1" src="https://github.com/user-attachments/assets/c3e36fe9-c53a-4529-b33a-d6d1f4b22444" />
 
 The architecture is designed with security and best practices in mind, utilizing a custom VPC to isolate resources.
 
@@ -36,9 +36,17 @@ The architecture is designed with security and best practices in mind, utilizing
     *   **Security Groups**: Firewall rules that control traffic between the different components of the architecture.
     *   **Bastion Host**: An EC2 instance in a public subnet that acts as a secure jump server to access resources in the private subnets (like the RDS instance for initial setup or debugging). An SSH key is automatically generated for access.
 
+## IAM Roles
+
+<img width="582" height="742" alt="iam_role_architecture_v1" src="https://github.com/user-attachments/assets/01c9464f-bf3a-4c99-af7b-a818e4697e98" />
+
+## RDS Database and Redshift access using dbaver
+
+<img width="1039" height="499" alt="bastion_host_rds_connection_v1" src="https://github.com/user-attachments/assets/08825818-be8d-4265-ac72-3c2019b51709" />
+
 ## Data Flow
 
-<img width="882" height="312" alt="hight_level_etl_flow" src="https://github.com/user-attachments/assets/c5b0bb60-42e0-4260-b47b-97067a13e347" />
+<img width="879" height="309" alt="hight_level_etl_flow_v1" src="https://github.com/user-attachments/assets/fb9a2237-31ed-4a43-845c-dac819f3597f" />
 
 ## Prerequisites
 
@@ -76,31 +84,41 @@ Before you begin, ensure you have the following installed and configured:
 
 Upon successful completion, Terraform will create a private key file `etl-etl-key.pem` in your directory and display the outputs.
 
+<img width="894" height="747" alt="terraform_output" src="https://github.com/user-attachments/assets/af94e84c-d68e-4c95-beb2-ccfbed09df0e" />
+
+
 ## Post-Deployment Steps
 
-<img width="1082" height="542" alt="bastion_host_rds_connection" src="https://github.com/user-attachments/assets/71b6a756-66d4-45f5-821b-905f599e340b" />
-
 1.  **Populate the Source Database**:
+
     *   The RDS database is created empty. You need to connect to it to create and populate the source table.
     *   Use the `bastion_public_ip` output and the generated `etl-etl-key.pem` to SSH into the bastion host.
     *   From the bastion host, connect to the RDS instance using the `rds_endpoint` output and the credentials stored in Secrets Manager.
     *   Create a table named `customers` in the `poc_source_db` database. The ETL job expects the following schema (as defined in `glue.tf`):
+    
         ```sql
-        CREATE TABLE customers (
-            id INTEGER,
-            first_name VARCHAR(50),
-            last_name VARCHAR(50),
-            email VARCHAR(100),
-            registration_date DATE
-        );
+         CREATE DATABASE poc_source_db;
+         USE poc_source_db;
+         
+         CREATE TABLE customers (
+           id INT PRIMARY KEY,
+           first_name VARCHAR(50),
+           email VARCHAR(100)
+         );
+         
+         INSERT INTO customers (id, first_name, email)
+         VALUES 
+         (1, 'Dhruv', 'dhruv@example.com'), 
+         (2, 'Rakesh', 'rakesh@example.com'),
+         (3, 'Manish', 'manish@example.com');
         ```
 
-2.  **Run the Glue Crawler**:
+1.  **Run the Glue Crawler**:
     *   Navigate to the AWS Glue console.
     *   Find the crawler named `etl-rds-crawler` and run it.
     *   This will populate the `etl_db_catalog` with a metadata table for your `customers` table.
 
-3.  **Run the Glue Job**:
+2.  **Run the Glue Job**:
     *   In the Glue console, find the job named `poc-rds-to-redshift` and run it.
     *   Once the job succeeds, the data from your RDS `customers` table will be available in the `public.customers` table in your Redshift cluster.
 
