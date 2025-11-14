@@ -1,5 +1,6 @@
 # AWS ETL Pipeline with Terraform
 
+
 This project provisions a complete Extract, Transform, and Load (ETL) pipeline on AWS using Terraform. It is designed to extract data from a source RDS MySQL database, process it with AWS Glue, and load it into a Redshift data warehouse.
 
 The entire infrastructure is defined as code, making it repeatable, versionable, and easy to manage.
@@ -37,9 +38,7 @@ The architecture is designed with security and best practices in mind, utilizing
 
 ## Data Flow
 
-```
-[RDS MySQL Source] ---> [Glue Crawler (Catalogs Schema)] ---> [Glue ETL Job] ---> [S3 Staging Bucket (Temp)] ---> [Redshift Destination]
-```
+<img width="882" height="312" alt="hight_level_etl_flow" src="https://github.com/user-attachments/assets/c5b0bb60-42e0-4260-b47b-97067a13e347" />
 
 ## Prerequisites
 
@@ -78,6 +77,8 @@ Before you begin, ensure you have the following installed and configured:
 Upon successful completion, Terraform will create a private key file `etl-etl-key.pem` in your directory and display the outputs.
 
 ## Post-Deployment Steps
+
+<img width="1082" height="542" alt="bastion_host_rds_connection" src="https://github.com/user-attachments/assets/71b6a756-66d4-45f5-821b-905f599e340b" />
 
 1.  **Populate the Source Database**:
     *   The RDS database is created empty. You need to connect to it to create and populate the source table.
