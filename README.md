@@ -6,6 +6,8 @@ The entire infrastructure is defined as code, making it repeatable, versionable,
 
 ## Architecture
 
+<img width="2392" height="1002" alt="ETL_Pipeline_Architecture" src="https://github.com/user-attachments/assets/23db692e-d428-4448-8ff2-e637f9ebf3ef" />
+
 The architecture is designed with security and best practices in mind, utilizing a custom VPC to isolate resources.
 
 1.  **VPC & Networking**:
